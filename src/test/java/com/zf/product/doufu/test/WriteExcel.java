@@ -106,8 +106,9 @@ public class WriteExcel {
 
         try {
             String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/resources/" + today + ".xlsx";
-            WriteExcel excel = new WriteExcel(path, today);
-            excel.writeNewExcel(sheetDataList);
+
+//            WriteExcel excel = new WriteExcel(path, today);
+//            excel.writeNewExcel(sheetDataList);
         } catch (Exception e) {
             e.printStackTrace();
         }

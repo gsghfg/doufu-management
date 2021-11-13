@@ -1,6 +1,7 @@
 package com.zf.product.doufu.excel;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zf.product.doufu.constants.ExcelConstants;
 import com.zf.product.doufu.excel.data.CellData;
 import com.zf.product.doufu.excel.data.CustomerSheetCell;
 import com.zf.product.doufu.excel.data.ProductSheetCell;
@@ -48,32 +49,45 @@ public class ReadSheet {
             XSSFSheet sheet = sheetIterator.next();
             String name = sheet.getSheetName();
             System.out.println("name:" + name);
-            if ("客户".equals(name)) {
+            if (ExcelConstants.CUSTOMER_SHEET_NAME.equals(name)) {
                 customerList = readCustomer(sheet);
                 System.out.println("customerList:" + JSONObject.toJSONString(customerList));
-            } else if ("商品".equals(name)) {
+            } else if (ExcelConstants.PRODUCT_SHEET_NAME.equals(name)) {
                 productList = readProduct(sheet);
                 System.out.println("productList:" + JSONObject.toJSONString(productList));
             }
         }
     }
 
+    public static List<Customer> readCustomer() {
+        ReadSheet data = new ReadSheet(ExcelConstants.BASIC_DATA_PATH);
+        XSSFSheet sheet = data.getSheets().getSheet(ExcelConstants.CUSTOMER_SHEET_NAME);
+        return readCustomer(sheet);
+    }
+
+    public static List<Product> readProduct() {
+        ReadSheet data = new ReadSheet(ExcelConstants.BASIC_DATA_PATH);
+        XSSFSheet sheet = data.getSheets().getSheet(ExcelConstants.PRODUCT_SHEET_NAME);
+        return readProduct(sheet);
+    }
+
+
     public static List<Customer> readCustomer(XSSFSheet sheet) {
         Customer a = null;
         List<Customer> aList = new ArrayList<Customer>();
         initHeader(sheet.getRow(0), new CustomerSheetCell());
         for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
-            XSSFRow Row = sheet.getRow(rowNum);
-            if (Row != null) {
+            XSSFRow row = sheet.getRow(rowNum);
+            if (row != null) {
                 //判断这行记录是否存在
-                if (Row.getLastCellNum() < 1 || "".equals(getValue(Row.getCell(1)))) {
+                if (row.getLastCellNum() < 1 || "".equals(getValue(row.getCell(1)))) {
                     continue;
                 }
                 //获取每一行
                 a = new Customer();
-                a.setName(getValue(Row.getCell(CustomerSheetCell.name().getCellNum())));
-                a.setPhone(getValue(Row.getCell(CustomerSheetCell.phone().getCellNum())));
-                a.setAddress(getValue(Row.getCell(CustomerSheetCell.address().getCellNum())));
+                a.setName(getValue(row.getCell(CustomerSheetCell.name().getCellNum())));
+                a.setPhone(getValue(row.getCell(CustomerSheetCell.phone().getCellNum())));
+                a.setAddress(getValue(row.getCell(CustomerSheetCell.address().getCellNum())));
                 a.setRowNumber(rowNum);
                 aList.add(a);
             }
