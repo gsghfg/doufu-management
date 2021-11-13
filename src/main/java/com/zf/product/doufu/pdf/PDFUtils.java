@@ -6,6 +6,7 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.zf.product.doufu.constants.PdfConstants;
 import com.zf.product.doufu.utils.ListUtils;
 
 import java.io.File;
@@ -55,7 +56,7 @@ public class PDFUtils {
         DEFAULT_LAYOUT = ListUtils.asList(new Integer[]{1, 1, 1, 1, 1});
         //
         HEADER_VALUES = new String[]{"序号", "商品", "数量(斤)", "单价(元)", "金额(元)"};
-        TITLE_VALUES = new String[]{"豆金豆制品批发"};
+        TITLE_VALUES = new String[]{PdfConstants.PDF_HEADER_CONTENT};
         try {
             bfCN = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", false);
             titleFont = new Font(bfCN, 14f, Font.BOLD);
