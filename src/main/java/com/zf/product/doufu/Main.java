@@ -10,10 +10,10 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("sample.fxml"));
-        primaryStage.setTitle("豆制品批发");
-        primaryStage.setScene(new Scene(root, 300, 275));
+    public void start(Stage primaryStage) throws Exception {
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/home.fxml"));
+        primaryStage.setTitle("主页");
+        primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 

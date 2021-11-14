@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.zf.product.doufu.controller.CustomerControl"
+            prefWidth="800.0">
+    <center>
+        <TabPane layoutX="2.0" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="客户管理">
+                    <content>
+                        <GridPane minHeight="0.0" minWidth="0.0">
+                            <TableView fx:id="customerTable" layoutX="14.0" layoutY="14.0" prefWidth="800.0">
+                                <columns>
+                                    <TableColumn fx:id="name" prefWidth="200.0" text="客户名称"/>
+                                    <TableColumn fx:id="phone" prefWidth="200" text="客户联系电话"/>
+                                    <TableColumn fx:id="address" prefWidth="200" text="客户地址"/>
+                                    <TableColumn fx:id="operate" prefWidth="200.0" text="操作">
+                                        <columns>
+                                            <TableColumn fx:id="edit" prefWidth="100.0" text="编辑"/>
+                                            <TableColumn fx:id="delete" prefWidth="100.0" text="删除"/>
+                                        </columns>
+                                    </TableColumn>
+                                </columns>
+                            </TableView>
+                        </GridPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+    <bottom>
+        <Button fx:id="addCustomerBt" layoutX="923.0" layoutY="14.0" mnemonicParsing="false"
+                onAction="#addCustomer" text="添加用户"/>
+    </bottom>
+</BorderPane>

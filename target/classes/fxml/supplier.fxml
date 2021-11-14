@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<GridPane prefHeight="757.0" prefWidth="1023.0"  xmlns:fx="http://javafx.com/fxml"
+          fx:controller="com.zf.product.doufu.controller.CustomerControl">
+    <children>
+        <TabPane layoutX="2.0" layoutY="40.0" prefHeight="706.0" prefWidth="1017.0" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="供货商管理">
+                    <content>
+                        <GridPane minHeight="0.0" minWidth="0.0" prefHeight="624.0" prefWidth="818.0">
+                            <children>
+                                <TableView fx:id="customerTable" layoutX="14.0" layoutY="14.0" prefHeight="650.0"
+                                           prefWidth="900.0">
+                                    <columns>
+                                        <TableColumn fx:id="name" prefWidth="75.0" text="客户名称"/>
+                                        <TableColumn fx:id="phone" prefWidth="75.0" text="客户联系电话"/>
+                                        <TableColumn fx:id="address" prefWidth="75.0" text="客户地址"/>
+                                    </columns>
+                                </TableView>
+                                <Button fx:id="addCustomerBt" layoutX="923.0" layoutY="14.0" mnemonicParsing="false"
+                                        onAction="#addCustomer" text="添加用户"/>
+                            </children>
+                        </GridPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </children>
+</GridPane>

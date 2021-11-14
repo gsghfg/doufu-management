@@ -1,0 +1,38 @@
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane fx:controller="com.zf.product.doufu.controller.HomeController"
+            xmlns:fx="http://javafx.com/fxml">
+    <top>
+        <MenuBar fx:id="menuBar">
+            <!-- 设置action实际上是作用于它的MenuItem身上的 -->
+            <Menu text="管理" onAction="#action">
+                <items>
+                    <MenuItem text="客户管理" id="/fxml/customer.fxml"/>
+                    <MenuItem text="商品管理" id="/fxml/product.fxml"/>
+                    <MenuItem text="供货商管理" id="/fxml/supplier.fxml"/>
+                    <MenuItem text="关闭"/>
+                </items>
+            </Menu>
+            <Menu text="下单" onAction="#action">
+                <items>
+                    <MenuItem text="下单" id="/fxml/order.fxml"/>
+                    <MenuItem text="复制"/>
+                    <MenuItem text="粘贴"/>
+                </items>
+            </Menu>
+            <Menu text="统计" onAction="#action">
+                <items>
+                    <MenuItem text="日统计"/>
+                    <MenuItem text="客户统计"/>
+                </items>
+            </Menu>
+        </MenuBar>
+    </top>
+    <center>
+        <ScrollPane prefHeight="800.0" BorderPane.alignment="CENTER">
+            <AnchorPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="593.0"
+                        prefWidth="800.0"/>
+        </ScrollPane>
+    </center>
+</BorderPane>
