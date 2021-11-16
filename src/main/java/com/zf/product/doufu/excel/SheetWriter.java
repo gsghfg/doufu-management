@@ -28,12 +28,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class WriteSheet {
-    private static final Logger logger = LoggerFactory.getLogger(WriteSheet.class);
+public class SheetWriter {
+    private static final Logger logger = LoggerFactory.getLogger(SheetWriter.class);
     private static String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/resources/2021-11-07.xlsx";
     private static String sheetCustomer = "客户";
     private static String sheetProduct = "客户";
 
+    public SheetWriter() {
+    }
 
     public static void main(String[] args) {
 //        List<Customer> beforeCustomerList = ReadSheet.readCustomer();
@@ -55,6 +57,35 @@ public class WriteSheet {
 //        List<Customer> afterCustomerList = ReadSheet.readCustomer();
 //        System.out.println("customerList after:" + JSONObject.toJSONString(afterCustomerList));
 
+//        testAppendCustomer();
+
+        testAppendProduct();
+
+    }
+
+    public static void testAppendCustomer() {
+        SheetReader.readCustomer();
+        for (int i = 1; i < 10; i++) {
+            Customer customer = new Customer();
+            customer.setName("张三" + i);
+            customer.setPhone("166xxxxxxxx1" + i);
+            customer.setAddress("张三的地址" + i);
+            appendCustomer(customer);
+        }
+    }
+
+    public static void testAppendProduct() {
+        SheetReader.readProduct();
+        for (int i = 1; i < 10; i++) {
+            Product product = new Product();
+            product.setName("doufu" + i);
+            product.setPrice(new Double(i));
+            appendProduct(product);
+        }
+    }
+
+
+    public static void testWriteOrder() {
         String str = "[{\"customerName\":\"张三\",\"goodsList\":[{\"productName\":\"豆腐\"},{\"productName\":\"面筋\"},{\"productName\":\"豆芽\"},{\"productName\":\"凉皮\"}]},{\"customerName\":\"李四\",\"goodsList\":[{\"productName\":\"豆腐\"},{\"productName\":\"面筋\"},{\"productName\":\"豆芽\"},{\"productName\":\"凉皮\"}]},{\"customerName\":\"王五\",\"goodsList\":[{\"productName\":\"豆腐\"},{\"productName\":\"面筋\"},{\"productName\":\"豆芽\"},{\"productName\":\"凉皮\"}]}]";
         List<Order> orderList = JSON.parseArray(str, Order.class);
         List<SheetData> sheetDataList = new ArrayList<>();
@@ -82,8 +113,6 @@ public class WriteSheet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
     public static void updateCustomer(List<Customer> customerList) {
@@ -103,18 +132,44 @@ public class WriteSheet {
         }, ExcelConstants.CUSTOMER_SHEET_NAME);
     }
 
+    public static void appendCustomer(Customer customer) {
+        appendRow((AppendSheetRow<Customer>) row -> {
+            XSSFCell nameCell = row.createCell(CustomerSheetCell.name().getCellNum());
+            nameCell.setCellValue(customer.getName());
+            XSSFCell addressCell = row.createCell(CustomerSheetCell.address().getCellNum());
+            addressCell.setCellValue(customer.getAddress());
+            XSSFCell phoneCell = row.createCell(CustomerSheetCell.phone().getCellNum());
+            phoneCell.setCellValue(customer.getPhone());
+        }, ExcelConstants.CUSTOMER_SHEET_NAME);
+    }
+
+    public static void appendProduct(Product product) {
+        appendRow((AppendSheetRow<Product>) row -> {
+            XSSFCell nameCell = row.createCell(ProductSheetCell.name().getCellNum());
+            nameCell.setCellValue(product.getName());
+            XSSFCell addressCell = row.createCell(ProductSheetCell.price().getCellNum());
+            addressCell.setCellValue(product.getPrice());
+        }, ExcelConstants.PRODUCT_SHEET_NAME);
+    }
+
     public static void updateProduct(List<Product> customerList) {
         Map<Integer, Product> customerMap = customerList.stream().collect(
                 Collectors.toMap(Product::getRowNumber, t -> t));
-        updateRow((UpdateSheetRow<Customer>) row -> {
-            int rowNum = row.getRowNum();
-            Product product = null;
-            if ((product = customerMap.get(rowNum)) != null) {
-                XSSFCell nameCell = row.getCell(ProductSheetCell.name().getCellNum());
-                nameCell.setCellValue(product.getName());
-                XSSFCell addressCell = row.getCell(ProductSheetCell.price().getCellNum());
-                addressCell.setCellValue(product.getPrice());
+        updateRow((UpdateSheetRow<Product>) row -> {
+            if(row!=null){
+                System.out.println(row.getRowNum());
+                int rowNum = row.getRowNum();
+                Product product = null;
+                if ((product = customerMap.get(rowNum)) != null) {
+                    XSSFCell nameCell = row.getCell(ProductSheetCell.name().getCellNum());
+                    nameCell.setCellValue(product.getName());
+                    XSSFCell addressCell = row.getCell(ProductSheetCell.price().getCellNum());
+                    addressCell.setCellValue(product.getPrice());
+                }
+            }else {
+
             }
+
         }, ExcelConstants.PRODUCT_SHEET_NAME);
     }
 
@@ -124,11 +179,45 @@ public class WriteSheet {
             FileInputStream fs = new FileInputStream(ExcelConstants.BASIC_DATA_PATH);
             XSSFWorkbook wb = new XSSFWorkbook(fs);
             XSSFSheet sheet = wb.getSheet(sheetName);
-            int lastRowNum = sheet.getLastRowNum();
+            int lastRowNum = sheet.getPhysicalNumberOfRows();
+            System.out.println("lastRowNum:"+lastRowNum);
             for (int rowNum = 0; rowNum < lastRowNum; rowNum++) {
                 XSSFRow row = sheet.getRow(rowNum);
                 updateSheetRow.doUpdate(row);
             }
+            FileOutputStream out = new FileOutputStream(ExcelConstants.BASIC_DATA_PATH);
+            out.flush();
+            wb.write(out);
+            out.close();
+        } catch (Exception e) {
+            logger.error("updateRow error.", e);
+        }
+    }
+
+    public static <T extends SheetRow> void appendRow(AppendSheetRow<T> appendSheetRow, String sheetName) {
+        try {
+            FileInputStream fs = new FileInputStream(ExcelConstants.BASIC_DATA_PATH);
+            XSSFWorkbook wb = new XSSFWorkbook(fs);
+            XSSFSheet sheet = wb.getSheet(sheetName);
+            int lastRowNum = sheet.getPhysicalNumberOfRows();
+            XSSFRow row = sheet.createRow(lastRowNum + 1);
+            appendSheetRow.doAppend(row);
+            FileOutputStream out = new FileOutputStream(ExcelConstants.BASIC_DATA_PATH);
+            out.flush();
+            wb.write(out);
+            out.close();
+        } catch (Exception e) {
+            logger.error("updateRow error.", e);
+        }
+    }
+
+    public static void deleteRow(String sheetName, int rowNum) {
+        try {
+            FileInputStream fs = new FileInputStream(ExcelConstants.BASIC_DATA_PATH);
+            XSSFWorkbook wb = new XSSFWorkbook(fs);
+            XSSFSheet sheet = wb.getSheet(sheetName);
+            XSSFRow row = sheet.getRow(rowNum);
+            sheet.removeRow(row);
             FileOutputStream out = new FileOutputStream(ExcelConstants.BASIC_DATA_PATH);
             out.flush();
             wb.write(out);
@@ -165,6 +254,8 @@ public class WriteSheet {
 
 }
 
-interface UpdateSheetRow<T extends SheetRow> {
-    void doUpdate(XSSFRow row);
-}
+
+
+
+
+

@@ -136,7 +136,7 @@ public class ExcelData {
         XSSFSheet sheet = workbook.getSheet(today);
 
         if (sheet != null) {
-            removeRow(sheet, 1, sheet.getLastRowNum());
+            removeRow(sheet, 1, sheet.getPhysicalNumberOfRows());
         } else {
             sheet = workbook.createSheet(today);
         }
@@ -226,7 +226,7 @@ public class ExcelData {
     public static List<Customer> readCustomer(Sheet Sheet) {
         Customer a = null;
         List<Customer> aList = new ArrayList<Customer>();
-        for (int rowNum = 1; rowNum <= Sheet.getLastRowNum(); rowNum++) {
+        for (int rowNum = 1; rowNum <= Sheet.getPhysicalNumberOfRows(); rowNum++) {
             Row Row = Sheet.getRow(rowNum);
             if (Row != null) {
                 //判断这行记录是否存在
@@ -248,7 +248,7 @@ public class ExcelData {
     public static List<Product> readProduct(Sheet Sheet) {
         Product a = null;
         List<Product> aList = new ArrayList<Product>();
-        for (int rowNum = 1; rowNum <= Sheet.getLastRowNum(); rowNum++) {
+        for (int rowNum = 1; rowNum <= Sheet.getPhysicalNumberOfRows(); rowNum++) {
             Row Row = Sheet.getRow(rowNum);
             if (Row != null) {
                 //判断这行记录是否存在

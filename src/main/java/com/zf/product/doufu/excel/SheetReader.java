@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ReadSheet {
+public class SheetReader {
     private XSSFSheet sheet;
     private XSSFWorkbook sheets;
 
@@ -28,7 +28,7 @@ public class ReadSheet {
         return sheets;
     }
 
-    ReadSheet(String filePath) {
+    SheetReader(String filePath) {
         FileInputStream fileInputStream = null;
         try {
             fileInputStream = new FileInputStream(filePath);
@@ -40,7 +40,7 @@ public class ReadSheet {
 
     public static void main(String[] args) {
         String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/resources/FirstTests.xlsx";
-        ReadSheet data = new ReadSheet(path);
+        SheetReader data = new SheetReader(path);
         XSSFWorkbook workbook = data.getSheets();
         Iterator<XSSFSheet> sheetIterator = workbook.xssfSheetIterator();
         List<Customer> customerList = null;
@@ -60,13 +60,13 @@ public class ReadSheet {
     }
 
     public static List<Customer> readCustomer() {
-        ReadSheet data = new ReadSheet(ExcelConstants.BASIC_DATA_PATH);
+        SheetReader data = new SheetReader(ExcelConstants.BASIC_DATA_PATH);
         XSSFSheet sheet = data.getSheets().getSheet(ExcelConstants.CUSTOMER_SHEET_NAME);
         return readCustomer(sheet);
     }
 
     public static List<Product> readProduct() {
-        ReadSheet data = new ReadSheet(ExcelConstants.BASIC_DATA_PATH);
+        SheetReader data = new SheetReader(ExcelConstants.BASIC_DATA_PATH);
         XSSFSheet sheet = data.getSheets().getSheet(ExcelConstants.PRODUCT_SHEET_NAME);
         return readProduct(sheet);
     }
@@ -76,7 +76,7 @@ public class ReadSheet {
         Customer a = null;
         List<Customer> aList = new ArrayList<Customer>();
         initHeader(sheet.getRow(0), new CustomerSheetCell());
-        for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+        for (int rowNum = 1; rowNum <= sheet.getPhysicalNumberOfRows(); rowNum++) {
             XSSFRow row = sheet.getRow(rowNum);
             if (row != null) {
                 //判断这行记录是否存在
@@ -114,7 +114,7 @@ public class ReadSheet {
         Product a = null;
         List<Product> aList = new ArrayList<Product>();
         initHeader(sheet.getRow(0), new ProductSheetCell());
-        for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+        for (int rowNum = 1; rowNum <= sheet.getPhysicalNumberOfRows(); rowNum++) {
             XSSFRow row = sheet.getRow(rowNum);
             if (row != null) {
                 //判断这行记录是否存在
