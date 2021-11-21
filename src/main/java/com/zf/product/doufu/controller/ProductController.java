@@ -158,6 +158,5 @@ public class ProductController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }

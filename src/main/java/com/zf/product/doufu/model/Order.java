@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Order extends SheetRow {
     private String customerName;
+    private String orderBrief;
     private List<Goods> goodsList;
 
     public List<Goods> getGoodsList() {
@@ -24,4 +25,11 @@ public class Order extends SheetRow {
         this.customerName = customerName;
     }
 
+    public String getOrderBrief() {
+        return orderBrief;
+    }
+
+    public void setOrderBrief(String orderBrief) {
+        this.orderBrief = orderBrief;
+    }
 }
