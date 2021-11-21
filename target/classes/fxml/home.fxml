@@ -14,11 +14,11 @@
                     <MenuItem text="关闭"/>
                 </items>
             </Menu>
-            <Menu text="下单" onAction="#action">
+            <Menu text="订单" onAction="#action">
                 <items>
+                    <MenuItem text="订单管理" id="/fxml/orderManager.fxml"/>
                     <MenuItem text="下单" id="/fxml/order.fxml"/>
-                    <MenuItem text="复制"/>
-                    <MenuItem text="粘贴"/>
+                    <MenuItem text="打印" id="/fxml/print.fxml"/>
                 </items>
             </Menu>
             <Menu text="统计" onAction="#action">

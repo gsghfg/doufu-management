@@ -13,6 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.Callback;
 import javafx.util.converter.DoubleStringConverter;
 
 import java.net.URL;
@@ -21,6 +22,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class ProductController implements Initializable {
+    @FXML
+    private TableColumn<Product, String> index;
     @FXML
     private TableColumn<Product, String> name;
     @FXML
@@ -51,13 +54,34 @@ public class ProductController implements Initializable {
         ObservableList<TableColumn<Product, ?>> observableList = productTableView
                 .getColumns();
         // name
-        observableList.get(0).setCellValueFactory(
+        observableList.get(1).setCellValueFactory(
                 new PropertyValueFactory("name"));
         // price
-        observableList.get(1).setCellValueFactory(
+        observableList.get(2).setCellValueFactory(
                 new PropertyValueFactory("price"));
         productList.forEach(product -> {
             tableList.add(product);
+        });
+
+        //index
+        index.setCellFactory(new Callback<TableColumn<Product, String>, TableCell<Product, String>>() {
+            @Override
+            public TableCell<Product, String> call(TableColumn<Product, String> col) {
+                TableCell<Product, String> cell = new TableCell<Product, String>() {
+                    @Override
+                    public void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        this.setText(null);
+                        this.setGraphic(null);
+
+                        if (!empty) {
+                            int rowIndex = this.getIndex() + 1;
+                            this.setText(String.valueOf(rowIndex));
+                        }
+                    }
+                };
+                return cell;
+            }
         });
 
         //配置可编辑

@@ -11,6 +11,7 @@
     <Label style="-fx-font: NORMAL 20 Tahoma;" text="客户管理" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
     <TableView fx:id="customerTableView" GridPane.columnIndex="0" GridPane.rowIndex="1">
         <columns>
+            <TableColumn fx:id="index" prefWidth="80.0" text="序号"/>
             <TableColumn fx:id="name" prefWidth="200.0" text="客户名称"/>
             <TableColumn fx:id="phone" prefWidth="200" text="客户联系电话"/>
             <TableColumn fx:id="address" prefWidth="200" text="客户地址"/>

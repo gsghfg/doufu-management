@@ -187,8 +187,9 @@ public class ExcelData {
                 int cell = 1;
                 for (int i = 0; i < goodsList.size(); i++) {
                     Goods goods = goodsList.get(i);
-                    (row.getCell(cell++) == null ? row.createCell(cell++) : row.getCell(cell++)).setCellValue(goods.getProductName());
-                    (row.getCell(cell++) == null ? row.createCell(cell++) : row.getCell(cell++)).setCellValue(goods.getProductAmount() == null ? String.valueOf(0) : String.valueOf(goods.getProductAmount()));
+                    (row.getCell(cell++) == null ? row.createCell(cell++) : row.getCell(cell++)).setCellValue(goods.getName());
+                    (row.getCell(cell++) == null ? row.createCell(cell++) : row.getCell(cell++)).setCellValue(goods.getPrice());
+                    (row.getCell(cell++) == null ? row.createCell(cell++) : row.getCell(cell++)).setCellValue(goods.getAmount() == null ? String.valueOf(0) : String.valueOf(goods.getAmount()));
                 }
                 index[0]++;
             }
@@ -214,7 +215,8 @@ public class ExcelData {
             List<Goods> goodsList = new ArrayList<>();
             productList.stream().forEach(product -> {
                 Goods goods = new Goods();
-                goods.setProductName(product.getName());
+                goods.setName(product.getName());
+                goods.setPrice(product.getPrice());
                 goodsList.add(goods);
             });
             order.setGoodsList(goodsList);

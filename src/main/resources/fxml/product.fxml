@@ -11,6 +11,7 @@
     <Label style="-fx-font: NORMAL 20 Tahoma;" text="商品管理" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
     <TableView fx:id="productTableView" GridPane.columnIndex="0" GridPane.rowIndex="1">
         <columns>
+            <TableColumn fx:id="index" prefWidth="80.0" text="序号"/>
             <TableColumn fx:id="name" prefWidth="200.0" text="商品名称"/>
             <TableColumn fx:id="price" prefWidth="200" text="商品单价"/>
             <TableColumn fx:id="operate" prefWidth="200.0" text="操作"/>

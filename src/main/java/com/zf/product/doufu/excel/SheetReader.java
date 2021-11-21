@@ -6,22 +6,23 @@ import com.zf.product.doufu.excel.data.CellData;
 import com.zf.product.doufu.excel.data.CustomerSheetCell;
 import com.zf.product.doufu.excel.data.ProductSheetCell;
 import com.zf.product.doufu.excel.data.ReadCell;
-import com.zf.product.doufu.model.Customer;
-import com.zf.product.doufu.model.Product;
+import com.zf.product.doufu.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class SheetReader {
-    private XSSFSheet sheet;
+    private static final Logger logger = LoggerFactory.getLogger(SheetReader.class);
+
     private XSSFWorkbook sheets;
 
     public XSSFWorkbook getSheets() {
@@ -38,7 +39,126 @@ public class SheetReader {
         }
     }
 
+    public static List<OrderFile> readOrderFiles(String directoryPath) {
+        File directory = new File(directoryPath);
+        File[] files = directory.listFiles();
+        List<OrderFile> orderFileList = new ArrayList<>();
+        for (File file : files) {
+            if (!file.isDirectory()) {
+                String fileName = file.getName();
+                String type = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+                String name = fileName.substring(0, fileName.lastIndexOf("."));
+                if ("xlsx".equals(type) && name.startsWith("order-")) {
+                    orderFileList.add(readOrderFile(file));
+                }
+            }
+        }
+//        System.out.println(JSONObject.toJSONString(orderFileList));
+        logger.info("readOrderFiles result:{}", JSONObject.toJSONString(orderFileList));
+        return orderFileList;
+    }
+
+    private static OrderFile readOrderFile(File file) {
+        OrderFile orderFile = new OrderFile();
+        orderFile.setFilePath(file.getPath());
+        String fileName = file.getName().substring(0, file.getName().lastIndexOf("."));
+        String orderMonth = fileName.substring(fileName.lastIndexOf("-") + 1, fileName.length());
+        orderFile.setOrderMonth(orderMonth);
+        SheetReader data = new SheetReader(file.getPath());
+        XSSFWorkbook workbook = data.getSheets();
+        Iterator<XSSFSheet> sheetIterator = workbook.xssfSheetIterator();
+        List<OrderContent> orderContents = new ArrayList<>();
+        while (sheetIterator.hasNext()) {
+            XSSFSheet sheet = sheetIterator.next();
+            orderContents.add(readOrderContent(sheet));
+        }
+        orderFile.setOrderContents(orderContents);
+        return orderFile;
+    }
+
+    private static OrderContent readOrderContent(XSSFSheet sheet) {
+        OrderContent orderContent = new OrderContent();
+        orderContent.setDate(sheet.getSheetName());
+        List<Order> orderDetails = new ArrayList<>();
+        Order order = null;
+        for (int rowNum = 1; rowNum <= sheet.getPhysicalNumberOfRows(); rowNum++) {
+            XSSFRow row = sheet.getRow(rowNum);
+            if (row != null) {
+                //判断这行记录是否存在
+                if (row.getLastCellNum() < 1 || "".equals(getValue(row.getCell(1)))) {
+                    continue;
+                }
+                //获取每一行
+                order = new Order();
+                order.setRowNumber(rowNum);
+                order.setCustomerName(getValue(row.getCell(0)));
+                List<Goods> goodsList = new ArrayList<>();
+                Goods goods = null;
+                for (int cellNum = 1; cellNum <= row.getPhysicalNumberOfCells(); cellNum++) {
+                    int index = cellNum % 3;
+                    if (index == 1) {
+                        String name = getValue(row.getCell(cellNum), String.class);
+                        goods.setName(name);
+                    } else if (index == 2) {
+                        Double price = Double.valueOf(row.getCell(cellNum).getStringCellValue());
+                        goods.setPrice(price);
+                    } else if (index == 0) {
+                        goods = new Goods();
+                        Double amount = Double.valueOf(row.getCell(cellNum).getStringCellValue());
+                        goods.setAmount(amount);
+                        goodsList.add(goods);
+                    }
+                }
+                order.setGoodsList(goodsList);
+                orderDetails.add(order);
+            }
+        }
+        orderContent.setOrderDetails(orderDetails);
+        orderContent.setBrief(getOrderBrief(orderDetails));
+        return orderContent;
+    }
+
+    private static String getOrderBrief(List<Order> orderDetails) {
+        List<Goods> goodsList = new ArrayList<>();
+        orderDetails.stream().map(Order::getGoodsList).forEach(list -> {
+            goodsList.addAll(list);
+        });
+        //商品，总数量，总金额
+        Map<String, Double[]> briefMap = new HashMap<>();
+        goodsList.stream().forEach(goods -> {
+            String name = goods.getName();
+            Double price = goods.getPrice();
+            Double amount = goods.getAmount();
+            Double[] amountChargeArray = null;
+            if ((amountChargeArray = briefMap.get(name)) == null) {
+                amountChargeArray = new Double[]{amount, amount * price};
+            } else {
+                amountChargeArray[0] += amount;
+                amountChargeArray[1] += (amount * price);
+            }
+            briefMap.put(name, amountChargeArray);
+        });
+        logger.info("briefMap:{}", JSONObject.toJSONString(briefMap));
+        StringBuffer buffer = new StringBuffer();
+        final Double[] charge = {0d};
+        briefMap.forEach((productName, amountChargeArray) -> {
+            buffer.append(productName).append(" 下单：").append(amountChargeArray[0]).append("斤，应收款：").append(amountChargeArray[1]).append("\n");
+            charge[0] += amountChargeArray[1];
+        });
+        buffer.append("共计：").append(charge[0]).append("元");
+        logger.info("brief:{}", buffer.toString());
+        return buffer.toString();
+    }
+
+
     public static void main(String[] args) {
+//        String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/resources/order-202111.xlsx";
+        String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/resources/order";
+
+        readOrderFiles(path);
+    }
+
+    public static void readBaseDataTest() {
         String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/resources/FirstTests.xlsx";
         SheetReader data = new SheetReader(path);
         XSSFWorkbook workbook = data.getSheets();
@@ -166,5 +286,30 @@ public class SheetReader {
                 break;
         }
         return value.trim();
+    }
+
+    public static <T> T getValue(Cell cell, Class<T> tClass) {
+        if (cell == null) {
+            return null;
+        }
+        CellType cellType = cell.getCellTypeEnum();
+        T value = (T) "";
+        switch (cellType) {
+            case NUMERIC:
+                value = (T) String.valueOf(cell.getNumericCellValue());
+                break;
+            case _NONE:
+            case ERROR:
+            case BLANK:
+            case FORMULA:
+                break;
+            case STRING:
+                value = (T) cell.getStringCellValue().trim();
+                break;
+            case BOOLEAN:
+                value = (T) String.valueOf(cell.getBooleanCellValue());
+                break;
+        }
+        return value;
     }
 }

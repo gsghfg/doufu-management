@@ -94,8 +94,9 @@ public class WriteExcel {
             Order order = orderList.get(i);
             dataList.add(order.getCustomerName());
             order.getGoodsList().forEach(goods -> {
-                dataList.add(goods.getProductName());
-                dataList.add(goods.getProductAmount() == null ? "0" : String.valueOf(goods.getProductAmount()));
+                dataList.add(goods.getName());
+                dataList.add(goods.getPrice() == null ? "0" : String.valueOf(goods.getPrice()));
+                dataList.add(goods.getAmount() == null ? "0" : String.valueOf(goods.getAmount()));
             });
             SheetData sheetData = new SheetData();
             sheetData.setRow(i);

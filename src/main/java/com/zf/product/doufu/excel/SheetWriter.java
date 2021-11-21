@@ -6,9 +6,11 @@ import com.zf.product.doufu.constants.ExcelConstants;
 import com.zf.product.doufu.excel.data.CustomerSheetCell;
 import com.zf.product.doufu.excel.data.ProductSheetCell;
 import com.zf.product.doufu.model.Customer;
+import com.zf.product.doufu.model.Goods;
 import com.zf.product.doufu.model.Order;
 import com.zf.product.doufu.model.Product;
 import com.zf.product.doufu.model.base.SheetRow;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -18,14 +20,13 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SheetWriter {
@@ -33,6 +34,9 @@ public class SheetWriter {
     private static String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/resources/2021-11-07.xlsx";
     private static String sheetCustomer = "客户";
     private static String sheetProduct = "客户";
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat MONTH_FORMAT = new SimpleDateFormat("yyyyMM");
 
     public SheetWriter() {
     }
@@ -59,8 +63,9 @@ public class SheetWriter {
 
 //        testAppendCustomer();
 
-        testAppendProduct();
-
+//        testAppendProduct();
+//        testWriteOrder();
+        testWriteOrder2();
     }
 
     public static void testAppendCustomer() {
@@ -84,21 +89,54 @@ public class SheetWriter {
         }
     }
 
+    public static void testWriteOrder2() {
+        List<Order> orderList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Order order = new Order();
+            order.setCustomerName("张三" + i);
+            List<Goods> goodsList = new ArrayList<>();
+            for (int j = 0; j < 10; j++) {
+                Goods goods = new Goods();
+                goods.setName("商品" + j);
+                goods.setPrice(4.3d);
+                goods.setAmount(Double.valueOf(i * j));
+                goodsList.add(goods);
+            }
+            order.setGoodsList(goodsList);
+            orderList.add(order);
+        }
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.set(2021, 11, 13); // 实际的calendar对象所表示的日期为2016年6月1日
+//        calendar.getTime();
+        String strDate="2021-11-16";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date = sdf.parse(strDate);
+            Calendar rightNow = Calendar.getInstance();
+            rightNow.setTime(date);
+            writeOrder(orderList, date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     public static void testWriteOrder() {
         String str = "[{\"customerName\":\"张三\",\"goodsList\":[{\"productName\":\"豆腐\"},{\"productName\":\"面筋\"},{\"productName\":\"豆芽\"},{\"productName\":\"凉皮\"}]},{\"customerName\":\"李四\",\"goodsList\":[{\"productName\":\"豆腐\"},{\"productName\":\"面筋\"},{\"productName\":\"豆芽\"},{\"productName\":\"凉皮\"}]},{\"customerName\":\"王五\",\"goodsList\":[{\"productName\":\"豆腐\"},{\"productName\":\"面筋\"},{\"productName\":\"豆芽\"},{\"productName\":\"凉皮\"}]}]";
         List<Order> orderList = JSON.parseArray(str, Order.class);
         List<SheetData> sheetDataList = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat monthFormat = new SimpleDateFormat("yyyyMM");
         String today = dateFormat.format(new Date());
+        String month = monthFormat.format(new Date());
         for (int i = 0; i < orderList.size(); i++) {
             logger.info("orderList:{}", JSONObject.toJSONString(orderList));
             List<String> dataList = new ArrayList<>();
             Order order = orderList.get(i);
             dataList.add(order.getCustomerName());
             order.getGoodsList().forEach(goods -> {
-                dataList.add(goods.getProductName());
-                dataList.add(goods.getProductAmount() == null ? "0" : String.valueOf(goods.getProductAmount()));
+                dataList.add(goods.getName());
+                dataList.add(goods.getAmount() == null ? "0" : String.valueOf(goods.getAmount()));
             });
             SheetData sheetData = new SheetData();
             sheetData.setRow(i);
@@ -108,8 +146,42 @@ public class SheetWriter {
         logger.info("excelSheetDataList:{}", JSONObject.toJSONString(sheetDataList));
 
         try {
-            String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/resources/" + today + ".xlsx";
-            writeNewExcel(path, today, sheetDataList);
+            String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/resources/order-" + month + ".xlsx";
+            saveOrUpdateSheet(path, "2021-11-16", sheetDataList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void writeOrder(List<Order> orderList, Date orderTime) {
+        List<SheetData> sheetDataList = new ArrayList<>();
+        String orderDay = DATE_FORMAT.format(orderTime);
+        String orderMonth = MONTH_FORMAT.format(orderTime);
+        int rowNum = 0;
+        for (int i = 0; i < orderList.size(); i++) {
+            logger.info("orderList:{}", JSONObject.toJSONString(orderList));
+            List<String> dataList = new ArrayList<>();
+            Order order = orderList.get(i);
+            for (Goods goods : order.getGoodsList()) {
+                if (StringUtils.isBlank(goods.getName()) || goods.getAmount() == null || goods.getAmount() <= 0d) {
+                    continue;
+                }
+                dataList.add(goods.getName());
+                dataList.add(String.valueOf(goods.getPrice()));
+                dataList.add(String.valueOf(goods.getAmount()));
+            }
+            if (!dataList.isEmpty()) {
+                dataList.add(0, order.getCustomerName());
+                SheetData sheetData = new SheetData();
+                sheetData.setRow(order.getRowNumber() == null ? rowNum++ : order.getRowNumber());
+                sheetData.setData(dataList.toArray(new String[0]));
+                sheetDataList.add(sheetData);
+            }
+        }
+        logger.info("excelSheetDataList:{}", JSONObject.toJSONString(sheetDataList));
+
+        try {
+            saveOrUpdateSheet(String.format(ExcelConstants.ORDER_DATA_PATH_TEMPLATE, orderMonth), orderDay, sheetDataList);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -156,7 +228,7 @@ public class SheetWriter {
         Map<Integer, Product> customerMap = customerList.stream().collect(
                 Collectors.toMap(Product::getRowNumber, t -> t));
         updateRow((UpdateSheetRow<Product>) row -> {
-            if(row!=null){
+            if (row != null) {
                 System.out.println(row.getRowNum());
                 int rowNum = row.getRowNum();
                 Product product = null;
@@ -166,7 +238,7 @@ public class SheetWriter {
                     XSSFCell addressCell = row.getCell(ProductSheetCell.price().getCellNum());
                     addressCell.setCellValue(product.getPrice());
                 }
-            }else {
+            } else {
 
             }
 
@@ -180,7 +252,7 @@ public class SheetWriter {
             XSSFWorkbook wb = new XSSFWorkbook(fs);
             XSSFSheet sheet = wb.getSheet(sheetName);
             int lastRowNum = sheet.getPhysicalNumberOfRows();
-            System.out.println("lastRowNum:"+lastRowNum);
+            System.out.println("lastRowNum:" + lastRowNum);
             for (int rowNum = 0; rowNum < lastRowNum; rowNum++) {
                 XSSFRow row = sheet.getRow(rowNum);
                 updateSheetRow.doUpdate(row);
@@ -228,7 +300,7 @@ public class SheetWriter {
     }
 
 
-    public static void writeNewExcel(String filePath, String sheetName, List<SheetData> dataList) {
+    public static void createExcel(String filePath, String sheetName, List<SheetData> dataList) {
         try {
             XSSFWorkbook workbook = new XSSFWorkbook();
             XSSFSheet sheet = workbook.createSheet(sheetName);
@@ -248,6 +320,48 @@ public class SheetWriter {
             stream.close();
         } catch (Exception e) {
             logger.error("writeNewExcel error.", e);
+        }
+    }
+
+    public static void saveOrUpdateSheet(String filePath, String sheetName, List<SheetData> dataList) {
+        try {
+            File file = new File(filePath);
+            if (file.exists()) {
+                updateExcel(filePath, sheetName, dataList);
+            } else {
+                createExcel(filePath, sheetName, dataList);
+            }
+        } catch (Exception e) {
+            logger.error("saveOrUpdateSheet error.", e);
+        }
+    }
+
+    public static void updateExcel(String filePath, String sheetName, List<SheetData> dataList) {
+        try {
+            FileInputStream fs = new FileInputStream(filePath);
+            XSSFWorkbook wb = new XSSFWorkbook(fs);
+            XSSFSheet sheet = wb.getSheet(sheetName);
+            if (sheet == null) {
+                sheet = wb.createSheet(sheetName);
+            }
+            XSSFSheet finalSheet = sheet;
+            dataList.forEach(sheetData -> {
+                String[] writeStrings = sheetData.getData();
+                //将内容写入指定的行号中
+                Row row = finalSheet.createRow(sheetData.getRow());
+                //遍历整行中的列序号
+                for (int j = 0; j < writeStrings.length; j++) {
+                    //根据行指定列坐标j,然后在单元格中写入数据
+                    Cell cell = row.createCell(j);
+                    cell.setCellValue(writeStrings[j]);
+                }
+            });
+            FileOutputStream out = new FileOutputStream(filePath);
+            out.flush();
+            wb.write(out);
+            out.close();
+        } catch (Exception e) {
+            logger.error("updateExcel error.", e);
         }
     }
 

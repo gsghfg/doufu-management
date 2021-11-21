@@ -5,6 +5,7 @@ import com.zf.product.doufu.constants.ExcelConstants;
 import com.zf.product.doufu.excel.SheetReader;
 import com.zf.product.doufu.excel.SheetWriter;
 import com.zf.product.doufu.model.Customer;
+import com.zf.product.doufu.model.OrderContent;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -12,6 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.Callback;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -19,6 +21,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class CustomerController implements Initializable {
+    @FXML
+    private TableColumn<Customer, String> index;
     @FXML
     private TableColumn<Customer, String> name;
     @FXML
@@ -36,10 +40,10 @@ public class CustomerController implements Initializable {
     @FXML
     private TextField addressField;
 
-    @FXML
-    private Button addCustomerBt;
-    @FXML
-    private Label labelText;
+//    @FXML
+//    private Button addCustomerBt;
+//    @FXML
+//    private Label labelText;
     @FXML
     private TableView<Customer> customerTableView;
 
@@ -57,16 +61,36 @@ public class CustomerController implements Initializable {
         ObservableList<TableColumn<Customer, ?>> observableList = customerTableView
                 .getColumns();
         // name
-        observableList.get(0).setCellValueFactory(
+        observableList.get(1).setCellValueFactory(
                 new PropertyValueFactory("name"));
         // phone
-        observableList.get(1).setCellValueFactory(
+        observableList.get(2).setCellValueFactory(
                 new PropertyValueFactory("phone"));
         // address
-        observableList.get(2).setCellValueFactory(
+        observableList.get(3).setCellValueFactory(
                 new PropertyValueFactory("address"));
         customerList.forEach(customer -> {
             tableList.add(customer);
+        });
+        //index
+        index.setCellFactory(new Callback<TableColumn<Customer, String>, TableCell<Customer, String>>() {
+            @Override
+            public TableCell<Customer, String> call(TableColumn<Customer, String> col) {
+                TableCell<Customer, String> cell = new TableCell<Customer, String>() {
+                    @Override
+                    public void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        this.setText(null);
+                        this.setGraphic(null);
+
+                        if (!empty) {
+                            int rowIndex = this.getIndex() + 1;
+                            this.setText(String.valueOf(rowIndex));
+                        }
+                    }
+                };
+                return cell;
+            }
         });
         //配置可编辑
         customerTableView.setEditable(true);
@@ -97,6 +121,7 @@ public class CustomerController implements Initializable {
                     ).setAddress(t.getNewValue());
                     updateCustomer((Customer) t.getTableView().getItems().get(t.getTablePosition().getRow()));
                 });
+        //operate
         operate.setCellFactory((col) -> {
             //UserLoad换成你自己的实体名称
             TableCell<Customer, String> cell = new TableCell<Customer, String>() {
