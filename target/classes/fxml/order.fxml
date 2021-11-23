@@ -6,23 +6,28 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.*?>
-<GridPane alignment="CENTER" hgap="10.0" vgap="10.0" xmlns:fx="http://javafx.com/fxml"
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.TextField?>
+<GridPane alignment="CENTER" hgap="10.0" vgap="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.zf.product.doufu.controller.OrderController">
     <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
     </padding>
     <Label style="-fx-font: NORMAL 20 Tahoma;" text="订货下单" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-    <DatePicker fx:id="orderDate" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-    <Button fx:id="saveButton" GridPane.columnIndex="1" GridPane.rowIndex="1" text="保存订单"/>
-    <Separator GridPane.columnIndex="0" GridPane.rowIndex="2" prefWidth="-Infinity"/>
-    <VBox fx:id="tableViewBox" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-    <!--    <TableView fx:id="customerTableView" GridPane.columnIndex="0" GridPane.rowIndex="1">-->
-    <!--        <columns>-->
-    <!--            <TableColumn fx:id="name" prefWidth="200.0" text="客户名称">-->
-    <!--            </TableColumn>-->
-    <!--            <TableColumn fx:id="phone" prefWidth="200" text="客户联系电话"/>-->
-    <!--            <TableColumn fx:id="address" prefWidth="200" text="客户地址"/>-->
-    <!--            <TableColumn fx:id="operate" prefWidth="200.0" text="操作"/>-->
-    <!--        </columns>-->
-    <!--    </TableView>-->
+    <HBox GridPane.columnIndex="0" GridPane.rowIndex="1">
+        <DatePicker fx:id="orderDate" />
+        <Label prefWidth="400"/>
+        <Button fx:id="saveButton"  text="保存订单" onAction="#saveOrder" alignment="CENTER_RIGHT"/>
+    </HBox>
+
+    <Separator GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+    <HBox GridPane.columnIndex="0" GridPane.rowIndex="3">
+        <ChoiceBox fx:id="customerChoice"/>
+        <ChoiceBox fx:id="productChoice"/>
+        <TextField fx:id="productPrice" prefWidth="200.0" promptText="商品价格"/>
+        <TextField fx:id="productAmount" prefWidth="200.0" promptText="商品数量"/>
+        <Button onAction="#addCustomerOrder" text="添加"/>
+    </HBox>
+    <Separator GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+    <VBox fx:id="tableViewBox" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
 </GridPane>

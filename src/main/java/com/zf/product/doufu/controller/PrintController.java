@@ -2,7 +2,6 @@ package com.zf.product.doufu.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zf.product.doufu.excel.SheetReader;
-import com.zf.product.doufu.excel.SheetWriter;
 import com.zf.product.doufu.model.*;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -33,19 +32,15 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class OrderController implements Initializable {
-    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
+public class PrintController implements Initializable {
+    private static final Logger logger = LoggerFactory.getLogger(PrintController.class);
+
+//    public PrintController(OrderContent orderContent) {
+//        this.orderContent = orderContent;
+//    }
 
     @FXML
     private DatePicker orderDate;
-    @FXML
-    private ChoiceBox customerChoice;
-    @FXML
-    private ChoiceBox productChoice;
-    @FXML
-    private TextField productPrice;
-    @FXML
-    private TextField productAmount;
 
     @FXML
     private VBox tableViewBox;
@@ -55,7 +50,6 @@ public class OrderController implements Initializable {
     private static final List<Product> productList;
     private static final List<Customer> customerList;
     private static final String[] productArray;
-    private static final String[] customerArray;
     private static final Map<String, Double> productPriceMap;
     private static final SimpleDateFormat ORDER_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final NumberFormat formatter = new DecimalFormat("0.00");
@@ -65,7 +59,6 @@ public class OrderController implements Initializable {
     static {
         productList = SheetReader.readProduct();
         customerList = SheetReader.readCustomer();
-        customerArray = customerList.stream().map(Customer::getName).collect(Collectors.toList()).toArray(new String[0]);
         productArray = productList.stream().map(Product::getName).collect(Collectors.toList()).toArray(new String[0]);
         productPriceMap = productList.stream().collect(Collectors.toMap(Product::getName, Product::getPrice));
     }
@@ -77,21 +70,7 @@ public class OrderController implements Initializable {
         if (orderContent == null) {
             initOrderContent();
         }
-        initCustomerBox(orderContent);
-        initTableViewBox();
-    }
-
-    private void initCustomerBox(OrderContent orderContent) {
-        customerChoice.setItems(FXCollections.observableArrayList(
-                customerArray));
-        productChoice.setItems(FXCollections.observableArrayList(
-                productArray));
-        productChoice.getSelectionModel().selectedIndexProperty().addListener(
-                (ObservableValue<? extends Number> ov,
-                 Number old_val, Number new_val) -> {
-                    productPrice.setText(String.valueOf(productPriceMap.get(productArray[new_val.intValue()])));
-                });
-
+        initTableViewBox(orderContent);
     }
 
     private void initOrderContent() {
@@ -135,7 +114,7 @@ public class OrderController implements Initializable {
     private void updateOrder(String orderDate, String customerName, List<Goods> updateGoodsList) {
         logger.info("updateOrder orderDate:{}, customerName:{}, updateGoodsList:{}", orderDate, customerName, JSONObject.toJSONString(updateGoodsList));
         updateOrderContent(orderDate, customerName, updateGoodsList);
-        initTableViewBox();
+        initTableViewBox(orderContent);
     }
 
 
@@ -218,6 +197,7 @@ public class OrderController implements Initializable {
 
         //tableView
         TableView<Goods> tableView = new TableView<>();
+//        tableView.setEditable(false);
         ObservableList<Goods> dataList =
                 FXCollections.observableArrayList(order.getGoodsList());
         //name
@@ -325,13 +305,13 @@ public class OrderController implements Initializable {
         addBox.getChildren().addAll(nameChoice, priceField, amountField, addGoodsButton);
         //分隔线
         Separator separator = new Separator();
-        separator.setPadding(new Insets(10, 0, 10, 0));
+        separator.setPadding(new Insets(10, 10, 10, 10));
 
         tableViewBox.getChildren().addAll(titleBox, tableView, addBox, separator);
     }
 
 
-    private void initTableViewBox() {
+    private void initTableViewBox(OrderContent orderContent) {
         tableViewBox.getChildren().clear();
         logger.info("init table view box...");
         if (StringUtils.isNotBlank(orderContent.getDate())) {
@@ -366,33 +346,20 @@ public class OrderController implements Initializable {
         printTableView(orderList);
     }
 
-    public void saveOrder() {
+    public void printAllOrder() {
         try {
-            Date date = ORDER_DATE_FORMAT.parse(orderDate.getValue().toString());
-            SheetWriter.writeOrder(orderContent.getOrderDetails(), date);
+            logger.info("print all order ...");
+//            Date date = ORDER_DATE_FORMAT.parse(orderDate.getValue().toString());
+//            SheetWriter.writeOrder(orderContent.getOrderDetails(), date);
             //跳转到订单页面
-            OrderContent orderContent = SheetReader.readOrderContent(date);
-            logger.info("readOrderContent:{}",JSONObject.toJSONString(orderContent));
-            this.orderContent = orderContent;
-            initTableViewBox();
+//            OrderContent orderContent = SheetReader.readOrderContent(date);
+//            this.orderContent = orderContent;
+//            initTableViewBox(orderContent);
         } catch (Exception e) {
             logger.error("saveOrder error", e);
         }
-    }
 
-    public void addCustomerOrder() {
-        try {
-            Double price = Double.valueOf(productPrice.getText());
-            Double amount = Double.valueOf(productAmount.getText());
-            Order order = new Order();
-            order.setCustomerName(customerChoice.getValue().toString());
-            order.setGoodsList(Arrays.asList(new Goods[]{new Goods(productChoice.getValue().toString(), price, amount)}));
-            orderContent.getOrderDetails().add(order);
-            String date = orderDate.getValue().toString();
-            updateOrder(date, customerChoice.getValue().toString(), order.getGoodsList());
-        } catch (Exception e) {
-            logger.error("addCustomerOrder error ", e);
-        }
 
     }
+
 }

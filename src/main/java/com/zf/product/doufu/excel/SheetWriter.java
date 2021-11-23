@@ -35,8 +35,7 @@ public class SheetWriter {
     private static String sheetCustomer = "客户";
     private static String sheetProduct = "客户";
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    private static final SimpleDateFormat MONTH_FORMAT = new SimpleDateFormat("yyyyMM");
+
 
     public SheetWriter() {
     }
@@ -108,7 +107,7 @@ public class SheetWriter {
 //        Calendar calendar = Calendar.getInstance();
 //        calendar.set(2021, 11, 13); // 实际的calendar对象所表示的日期为2016年6月1日
 //        calendar.getTime();
-        String strDate="2021-11-16";
+        String strDate = "2021-11-16";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         try {
             Date date = sdf.parse(strDate);
@@ -155,8 +154,8 @@ public class SheetWriter {
 
     public static void writeOrder(List<Order> orderList, Date orderTime) {
         List<SheetData> sheetDataList = new ArrayList<>();
-        String orderDay = DATE_FORMAT.format(orderTime);
-        String orderMonth = MONTH_FORMAT.format(orderTime);
+        String orderDay = ExcelConstants.DATE_FORMAT.format(orderTime);
+        String orderMonth = ExcelConstants.MONTH_FORMAT.format(orderTime);
         int rowNum = 0;
         for (int i = 0; i < orderList.size(); i++) {
             logger.info("orderList:{}", JSONObject.toJSONString(orderList));
@@ -325,12 +324,14 @@ public class SheetWriter {
 
     public static void saveOrUpdateSheet(String filePath, String sheetName, List<SheetData> dataList) {
         try {
+
             File file = new File(filePath);
             if (file.exists()) {
                 updateExcel(filePath, sheetName, dataList);
             } else {
                 createExcel(filePath, sheetName, dataList);
             }
+            logger.info("save sheet, path:{}, sheetName:{}, dataList:{}", filePath, sheetName, JSONObject.toJSONString(dataList));
         } catch (Exception e) {
             logger.error("saveOrUpdateSheet error.", e);
         }

@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class SheetReader {
@@ -76,12 +78,21 @@ public class SheetReader {
         return orderFile;
     }
 
+
+    public static OrderContent readOrderContent(Date date) {
+        String orderDay = ExcelConstants.DATE_FORMAT.format(date);
+        String orderMonth = ExcelConstants.MONTH_FORMAT.format(date);
+        SheetReader data = new SheetReader(String.format(ExcelConstants.ORDER_DATA_PATH_TEMPLATE, orderMonth));
+        XSSFWorkbook workbook = data.getSheets();
+         return readOrderContent(workbook.getSheet(orderDay));
+    }
+
     private static OrderContent readOrderContent(XSSFSheet sheet) {
         OrderContent orderContent = new OrderContent();
         orderContent.setDate(sheet.getSheetName());
         List<Order> orderDetails = new ArrayList<>();
         Order order = null;
-        for (int rowNum = 1; rowNum <= sheet.getPhysicalNumberOfRows(); rowNum++) {
+        for (int rowNum = 0; rowNum <= sheet.getPhysicalNumberOfRows(); rowNum++) {
             XSSFRow row = sheet.getRow(rowNum);
             if (row != null) {
                 //判断这行记录是否存在
@@ -97,13 +108,13 @@ public class SheetReader {
                 for (int cellNum = 1; cellNum <= row.getPhysicalNumberOfCells(); cellNum++) {
                     int index = cellNum % 3;
                     if (index == 1) {
+                        goods = new Goods();
                         String name = getValue(row.getCell(cellNum), String.class);
                         goods.setName(name);
                     } else if (index == 2) {
                         Double price = Double.valueOf(row.getCell(cellNum).getStringCellValue());
                         goods.setPrice(price);
                     } else if (index == 0) {
-                        goods = new Goods();
                         Double amount = Double.valueOf(row.getCell(cellNum).getStringCellValue());
                         goods.setAmount(amount);
                         goodsList.add(goods);
@@ -153,9 +164,18 @@ public class SheetReader {
 
     public static void main(String[] args) {
 //        String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/resources/order-202111.xlsx";
-        String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/resources/order";
+//        String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/resources/order";
 
-        readOrderFiles(path);
+//        readOrderFiles(path);
+
+       SimpleDateFormat ORDER_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date = ORDER_DATE_FORMAT.parse("2021-11-23");
+            System.out.println(JSONObject.toJSONString(readOrderContent(date)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static void readBaseDataTest() {

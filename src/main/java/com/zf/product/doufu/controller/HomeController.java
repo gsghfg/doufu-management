@@ -53,7 +53,7 @@ public class HomeController implements Initializable {
     }
 
 
-    private void skipView(String pagePath) throws IOException {
+    public void skipView(String pagePath) throws IOException {
 //        logger.info("显示剪切板界面");
         ObservableList<Node> scrolChildren = mainPane.getChildren();
         scrolChildren.clear();
