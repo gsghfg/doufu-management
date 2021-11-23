@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <GridPane alignment="CENTER" hgap="10.0" vgap="10.0" xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.zf.product.doufu.controller.PrintController">
@@ -12,8 +9,13 @@
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
     </padding>
     <Label style="-fx-font: NORMAL 20 Tahoma;" text="打印订单" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-    <DatePicker fx:id="orderDate" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-    <Button fx:id="printButton" GridPane.columnIndex="1" GridPane.rowIndex="1" text="全部打印" onAction="#printAllOrder"/>
-    <Separator GridPane.columnIndex="0" GridPane.rowIndex="2" prefWidth="-Infinity"/>
-    <VBox fx:id="tableViewBox" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+    <Separator GridPane.columnIndex="0" GridPane.rowIndex="1" prefWidth="-Infinity"/>
+    <HBox GridPane.columnIndex="0" GridPane.rowIndex="2">
+        <ChoiceBox fx:id="monthChoice"/>
+        <ChoiceBox fx:id="dayChoice"/>
+        <Label prefWidth="400"/>
+        <Button fx:id="saveButton" text="全部打印" onAction="#printAllOrder"/>
+    </HBox>
+    <Separator GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+    <VBox fx:id="tableViewBox" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
 </GridPane>

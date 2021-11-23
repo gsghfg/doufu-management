@@ -7,18 +7,25 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.zf.product.doufu.constants.PdfConstants;
+import com.zf.product.doufu.model.Order;
 import com.zf.product.doufu.utils.ListUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 /**
  * @author clh
  */
 public class PDFUtils {
+    private static final Logger logger = LoggerFactory.getLogger(PDFUtils.class);
+
     public static BaseFont bfCN = null;
     public static Font titleFont = null;
     //    public static Font titleFont2 = null;
@@ -503,35 +510,35 @@ public class PDFUtils {
             count += i;
             contentList.add(data);
         }
-        contentList.add(ListUtils.asList(new String[]{"合计:", String.valueOf(count)}));
+
         String[] briefValue = {"订单编号:", "日期：2021-10-21"};
         createPdf(path, contentList, briefValue);
     }
+
+    private static final NumberFormat formatter = new DecimalFormat("0.00");
+    static String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/java/com/zf/product/doufu/pdf/test.pdf";
+
+    public static void printOrder(String orderDay, Order order) {
+        String[] briefValue = {"客户：" + order.getCustomerName(), "日期：" + orderDay};
+        ArrayList<ArrayList<String>> contentList = new ArrayList<>();
+        final double[] charge = {0d};
+        final int[] index = {1};
+        order.getGoodsList().forEach(goods -> {
+            Double produceCharge = goods.getPrice() * goods.getAmount();
+            ArrayList<String> data = ListUtils.asList(new String[]{String.valueOf(index[0]), goods.getName(), String.valueOf(goods.getPrice()), String.valueOf(goods.getAmount()), formatter.format(produceCharge)});
+            charge[0] += produceCharge;
+            index[0]++;
+            contentList.add(data);
+        });
+        contentList.add(ListUtils.asList(new String[]{"合计:", formatter.format(charge[0])}));
+        try {
+            createPdf(path, contentList, briefValue);
+        } catch (Exception e) {
+            logger.error("print pdf error", e);
+        }
+    }
+
 }
 
-class ContentCell {
-    private String value;
-    private PdfPCell cell;
 
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public PdfPCell getCell() {
-        return cell;
-    }
-
-    public void setCell(PdfPCell cell) {
-        this.cell = cell;
-    }
-
-    public ContentCell(String value, PdfPCell cell) {
-        this.value = value;
-        this.cell = cell;
-    }
-}
 

@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class SheetReader {
@@ -55,9 +53,41 @@ public class SheetReader {
                 }
             }
         }
-//        System.out.println(JSONObject.toJSONString(orderFileList));
         logger.info("readOrderFiles result:{}", JSONObject.toJSONString(orderFileList));
         return orderFileList;
+    }
+
+    /**
+     * 读取订单目录下的所有订单日期
+     *
+     * @param directoryPath
+     * @return
+     */
+    public static Map<String, String[]> readOrderDays(String directoryPath) {
+        File directory = new File(directoryPath);
+        File[] files = directory.listFiles();
+        Map<String, String[]> result = new HashMap<>();
+        for (File file : files) {
+            if (!file.isDirectory()) {
+                String fileName = file.getName();
+                String type = fileName.substring(fileName.lastIndexOf(".") + 1);
+                String name = fileName.substring(0, fileName.lastIndexOf("."));
+                if ("xlsx".equals(type) && name.startsWith("order-")) {
+                    String orderMonth = name.substring(fileName.lastIndexOf("-") + 1);
+                    SheetReader data = new SheetReader(file.getPath());
+                    XSSFWorkbook workbook = data.getSheets();
+                    Iterator<XSSFSheet> sheetIterator = workbook.xssfSheetIterator();
+                    List<String> dayList = new ArrayList<>();
+                    while (sheetIterator.hasNext()) {
+                        XSSFSheet sheet = sheetIterator.next();
+                        dayList.add(sheet.getSheetName());
+                    }
+                    result.put(orderMonth, dayList.toArray(new String[0]));
+                }
+            }
+        }
+        logger.info("readOrderDays result:{}", JSONObject.toJSONString(result));
+        return result;
     }
 
     private static OrderFile readOrderFile(File file) {
@@ -84,7 +114,15 @@ public class SheetReader {
         String orderMonth = ExcelConstants.MONTH_FORMAT.format(date);
         SheetReader data = new SheetReader(String.format(ExcelConstants.ORDER_DATA_PATH_TEMPLATE, orderMonth));
         XSSFWorkbook workbook = data.getSheets();
-         return readOrderContent(workbook.getSheet(orderDay));
+        return readOrderContent(workbook.getSheet(orderDay));
+    }
+
+    public static OrderContent readOrderContent(String orderDay) {
+        String[] array = orderDay.split("-");
+        String orderMonth = array[0] + array[1];
+        SheetReader data = new SheetReader(String.format(ExcelConstants.ORDER_DATA_PATH_TEMPLATE, orderMonth));
+        XSSFWorkbook workbook = data.getSheets();
+        return readOrderContent(workbook.getSheet(orderDay));
     }
 
     private static OrderContent readOrderContent(XSSFSheet sheet) {
@@ -168,13 +206,14 @@ public class SheetReader {
 
 //        readOrderFiles(path);
 
-       SimpleDateFormat ORDER_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            Date date = ORDER_DATE_FORMAT.parse("2021-11-23");
-            System.out.println(JSONObject.toJSONString(readOrderContent(date)));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+//        SimpleDateFormat ORDER_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+//        try {
+//            Date date = ORDER_DATE_FORMAT.parse("2021-11-23");
+//            System.out.println(JSONObject.toJSONString(readOrderContent(date)));
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+        System.out.println(SheetReader.readOrderDays(ExcelConstants.ORDER_DIRECTORY_PATH));
 
     }
 

@@ -372,7 +372,7 @@ public class OrderController implements Initializable {
             SheetWriter.writeOrder(orderContent.getOrderDetails(), date);
             //跳转到订单页面
             OrderContent orderContent = SheetReader.readOrderContent(date);
-            logger.info("readOrderContent:{}",JSONObject.toJSONString(orderContent));
+            logger.info("readOrderContent:{}", JSONObject.toJSONString(orderContent));
             this.orderContent = orderContent;
             initTableViewBox();
         } catch (Exception e) {
