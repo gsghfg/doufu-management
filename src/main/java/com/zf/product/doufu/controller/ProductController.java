@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class ProductController implements Initializable {
+public class ProductController extends BaseController implements Initializable {
     @FXML
     private TableColumn<Product, String> index;
     @FXML

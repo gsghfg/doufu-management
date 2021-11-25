@@ -1,26 +1,19 @@
 package com.zf.product.doufu.controller;
 
-import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.AnchorPane;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class HomeController implements Initializable {
+public class HomeController extends BaseController implements Initializable {
 
-    @FXML
-    private MenuBar menuBar;
 
-    @FXML
-    private AnchorPane mainPane;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -53,10 +46,7 @@ public class HomeController implements Initializable {
     }
 
 
-    public void skipView(String pagePath) throws IOException {
-//        logger.info("显示剪切板界面");
-        ObservableList<Node> scrolChildren = mainPane.getChildren();
-        scrolChildren.clear();
-        scrolChildren.add(FXMLLoader.load(getClass().getResource(pagePath)));
+    public void exit() {
+
     }
 }

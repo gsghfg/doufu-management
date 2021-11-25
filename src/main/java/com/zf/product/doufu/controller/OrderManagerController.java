@@ -9,7 +9,10 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
@@ -26,7 +29,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-public class OrderManagerController implements Initializable {
+public class OrderManagerController extends BaseController implements Initializable {
     private static final Logger logger = LoggerFactory.getLogger(OrderManagerController.class);
     @FXML
     private TableColumn<OrderContent, String> index;
@@ -117,7 +120,11 @@ public class OrderManagerController implements Initializable {
 
                         //获取list列表中的位置，进而获取列表对应的信息数据
                         OrderContent orderContent = tableList.get(getIndex());
-
+                        try {
+                            Parent root = FXMLLoader.load(getClass().getResource("/fxml/home.fxml"));
+                        } catch (Exception e) {
+                            logger.error("skip error", e);
+                        }
 
                     });
 

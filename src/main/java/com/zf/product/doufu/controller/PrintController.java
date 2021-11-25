@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class PrintController implements Initializable {
+public class PrintController extends BaseController implements Initializable {
     private static final Logger logger = LoggerFactory.getLogger(PrintController.class);
 
     @FXML

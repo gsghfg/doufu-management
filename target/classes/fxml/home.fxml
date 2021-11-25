@@ -11,7 +11,7 @@
                     <MenuItem text="客户管理" id="/fxml/customer.fxml"/>
                     <MenuItem text="商品管理" id="/fxml/product.fxml"/>
                     <MenuItem text="供货商管理" id="/fxml/supplier.fxml"/>
-                    <MenuItem text="关闭"/>
+                    <MenuItem text="关闭" onAction="#exit"/>
                 </items>
             </Menu>
             <Menu text="订单" onAction="#action">

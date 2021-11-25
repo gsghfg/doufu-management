@@ -33,7 +33,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class OrderController implements Initializable {
+public class OrderController extends BaseController implements Initializable {
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     @FXML
@@ -73,7 +73,7 @@ public class OrderController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        logger.info("init ...");
+        logger.info("init ... {}", location);
         if (orderContent == null) {
             initOrderContent();
         }

@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class CustomerController implements Initializable {
+public class CustomerController extends BaseController implements Initializable {
     @FXML
     private TableColumn<Customer, String> index;
     @FXML
@@ -40,10 +40,6 @@ public class CustomerController implements Initializable {
     @FXML
     private TextField addressField;
 
-//    @FXML
-//    private Button addCustomerBt;
-//    @FXML
-//    private Label labelText;
     @FXML
     private TableView<Customer> customerTableView;
 
