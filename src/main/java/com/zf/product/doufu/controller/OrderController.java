@@ -73,7 +73,8 @@ public class OrderController extends BaseController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        logger.info("init ... {}", location);
+
+        logger.info("init ... 【{}】, resources:{}", location,JSONObject.toJSONString(resources));
         if (orderContent == null) {
             initOrderContent();
         }

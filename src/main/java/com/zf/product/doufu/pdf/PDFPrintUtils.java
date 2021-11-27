@@ -1,5 +1,6 @@
 package com.zf.product.doufu.pdf;
 
+import com.alibaba.fastjson.JSONObject;
 import com.zf.product.doufu.constants.PdfConstants;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
@@ -7,6 +8,10 @@ import org.apache.pdfbox.printing.PDFPrintable;
 import org.apache.pdfbox.printing.Scaling;
 
 import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.attribute.standard.Media;
+import javax.print.attribute.standard.MediaSizeName;
+import javax.print.attribute.standard.MediaTray;
 import java.awt.print.Book;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
@@ -16,8 +21,26 @@ import java.io.File;
 public class PDFPrintUtils {
     public static void main(String[] args) {
         try {
-            printPdf("D:\\workspace\\doufu\\doufu-management\\src\\main\\java\\com\\zf\\product\\doufu\\pdf\\test.pdf",PdfConstants.PRINTER_NAME);
+//            printPdf("D:\\workspace\\doufu\\doufu-management\\src\\main\\java\\com\\zf\\product\\doufu\\pdf\\test.pdf",PdfConstants.PRINTER_NAME);
 //            PrinterJob printerJob = getPrintServiceByName(PdfConstants.PRINTER_NAME);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+//        PrintService printer = PrintServiceLookup.lookupDefaultPrintService();
+//        Media[] objs = (Media[]) printer.getSupportedAttributeValues(Media.class, null, null);
+//        for (Media obj : objs) {
+//            if (obj instanceof MediaSizeName) {
+//
+//                obj.getValue();
+//                System.out.println("纸张型号：" + JSONObject.toJSONString(obj)+", value:"+obj.getValue());
+//            } else if (obj instanceof MediaTray) {
+//                System.out.println("纸张来源：" + obj);
+//            }
+//        }
+
+        try {
+            getPrintServiceByName(PdfConstants.PRINTER_NAME);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -26,6 +49,10 @@ public class PDFPrintUtils {
 
     public static PrinterJob getPrintServiceByName(String printerName) throws Exception {
         PrinterJob job = PrinterJob.getPrinterJob();
+        System.out.println(JSONObject.toJSON(job.defaultPage()));
+        System.out.println(job.defaultPage().getHeight()+", "+job.defaultPage().getWidth());
+        System.out.println(job.defaultPage().getImageableX()+", "+job.defaultPage().getImageableY());
+        System.out.println(job.defaultPage().getImageableHeight()+", "+job.defaultPage().getImageableWidth());
         // 遍历查询打印机名称
         boolean flag = false;
         for (PrintService ps : PrinterJob.lookupPrintServices()) {
@@ -47,17 +74,21 @@ public class PDFPrintUtils {
     public static void setPageStyle(PDDocument document, PrinterJob job) {
         job.setPageable(new PDFPageable(document));
         Paper paper = new Paper();
-        double width = 349;
-        double height = 394;
-        // 设置打印纸张大小
+        int width = 340;
+        int height = 392;
+//        // 设置打印纸张大小
         paper.setSize(width, height); // 1/72 inch
-        // 设置边距，单位是像素，10mm边距，对应 28px
-        double marginLeft = -36;
-        double marginRight = 0;
-        double marginTop = 36;
-        double marginBottom = 0;
+//        // 设置边距，单位是像素，10mm边距，对应 28px
+        int marginLeft = 0;
+        int marginRight = 0;
+        int marginTop = 0;
+        int marginBottom = 0;
+//        PageFormat format = job.defaultPage();
+//        Paper paper = format.getPaper();
         // 设置打印位置 坐标
         paper.setImageableArea(marginLeft, marginRight, width - (marginLeft + marginRight), height - (marginTop + marginBottom));
+//        paper.setImageableArea(marginLeft, marginRight, 339, 384);
+
         // custom page format
         PageFormat pageFormat = new PageFormat();
         pageFormat.setPaper(paper);

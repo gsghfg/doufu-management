@@ -82,13 +82,11 @@ public class PrintController extends BaseController implements Initializable {
     private void printCustomerOrderView(Order order) {
         //title box
         HBox titleBox = new HBox();
-        //checkBox
-        CheckBox checkBox = new CheckBox();
         //name
         Label customerName = new Label(order.getCustomerName());
         customerName.setFont(new Font(15));
         customerName.setPadding(new Insets(2, 2, 5, 5));
-        titleBox.getChildren().addAll(checkBox, customerName);
+        titleBox.getChildren().addAll(customerName);
 
         //tableView
         TableView<Goods> tableView = new TableView<>();

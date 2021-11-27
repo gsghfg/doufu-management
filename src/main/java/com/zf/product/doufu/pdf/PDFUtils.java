@@ -1,6 +1,6 @@
 package com.zf.product.doufu.pdf;
 
-import com.alibaba.fastjson.JSONObject;
+import com.itextpdf.text.Font;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -12,6 +12,7 @@ import com.zf.product.doufu.utils.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -62,7 +63,7 @@ public class PDFUtils {
         TITLE_VALUES = new String[]{PdfConstants.PDF_HEADER_CONTENT};
         try {
             bfCN = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", false);
-            titleFont = new Font(bfCN, 20f, Font.BOLD);
+            titleFont = new Font(bfCN, 20f);
             customerFont = new Font(bfCN, 14f);
             contentFont = new Font(bfCN, 12f);
             smallBoldFont = new Font(bfCN, 8f);
@@ -72,6 +73,14 @@ public class PDFUtils {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        String[] fontNames = e.getAvailableFontFamilyNames();
+        for (String fontName : fontNames) {
+            System.out.println(fontName);
         }
     }
 
@@ -125,7 +134,17 @@ public class PDFUtils {
         p.setAlignment(Paragraph.ALIGN_CENTER);
         PdfPCell cellN = new PdfPCell(p);
         cellN.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-        cellN.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+        cellN.setVerticalAlignment(PdfPCell.ALIGN_JUSTIFIED_ALL);
+        cellN.setMinimumHeight(height);
+        return cellN;
+    }
+
+    public static PdfPCell getTitlePdfCell(String value, Font font, float height) {
+        Paragraph p = new Paragraph(value, font);
+        p.setAlignment(Paragraph.ALIGN_CENTER);
+        PdfPCell cellN = new PdfPCell(p);
+        cellN.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+        cellN.setVerticalAlignment(PdfPCell.ALIGN_TOP);
         cellN.setMinimumHeight(height);
         return cellN;
     }
@@ -160,7 +179,7 @@ public class PDFUtils {
             for (int j = 0; j < v.size(); j++) {
                 PdfPCell cell = null;
                 if (i == 0) {
-                    cell = getNormalPdfCell(v.get(j), titleFont, height);
+                    cell = getTitlePdfCell(v.get(j), titleFont, height + 2);
                 } else if (i == 1 && j == 0) {
                     cell = getAlignLeftPdfCell(v.get(j), customerFont, height);
                 } else if (i == 1 && j == 1) {
@@ -168,7 +187,6 @@ public class PDFUtils {
                 } else {
                     cell = getNormalPdfCell(v.get(j), contentFont, height);
                 }
-                System.out.println("i:" + i + ", j:" + j + ", value:" + v.get(j));
                 if (r.get(j) > 1) {
                     cell.setRowspan(r.get(j));
                 }
@@ -203,7 +221,7 @@ public class PDFUtils {
 
 
     public static void createPdf(String path, ArrayList<ArrayList<String>> contentList, String[] briefValue) throws FileNotFoundException, DocumentException {
-        Document document = new Document(new RectangleReadOnly(340f, 396f));
+        Document document = new Document(new RectangleReadOnly(340f, 396f),28,28,28,28);
         File file = new File(path);
         if (!file.exists()) {
             try {
@@ -215,7 +233,7 @@ public class PDFUtils {
         PdfWriter.getInstance(document, new FileOutputStream(new File(path)));
 
         document.open();
-        float[] f1 = {40f, 80f, 60f, 60f, 60f};
+        float[] f1 = {80f, 110f, 120f, 120f, 120f};
 
         //添加内容
         //values list
@@ -245,7 +263,7 @@ public class PDFUtils {
         float[] e3 = {300f};
         document.add(getExplain(e3, e2, smallBoldFont, 12f));
 
-        System.out.println(JSONObject.toJSONString(document));
+        logger.info("create pdf:{}", path);
         document.close();
     }
 
@@ -332,7 +350,7 @@ public class PDFUtils {
         try {
             String tempPdfPath = PdfConstants.TEMP_DIRECT + File.separator + orderDay + "." + order.getCustomerName() + ".pdf";
             createPdf(tempPdfPath, contentList, briefValue);
-            PDFPrintUtils.printPdf(tempPdfPath, PdfConstants.PRINTER_NAME);
+//            PDFPrintUtils.printPdf(tempPdfPath, PdfConstants.PRINTER_NAME);
         } catch (Exception e) {
             logger.error("print orderDay:" + orderDay + " ,customerName:" + order.getCustomerName() + " order error", e);
         }

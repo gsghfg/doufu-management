@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<GridPane prefHeight="757.0" prefWidth="1023.0" xmlns:fx="http://javafx.com/fxml">
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+    </padding>
+    <Label style="-fx-font: NORMAL 20 Tahoma;" text="供货商管理" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+    <Label style="-fx-font-size: 18" text="敬请期待..." GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+</GridPane>

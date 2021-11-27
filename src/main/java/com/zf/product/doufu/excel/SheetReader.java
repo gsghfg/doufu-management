@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 
 public class SheetReader {
@@ -191,7 +193,7 @@ public class SheetReader {
         StringBuffer buffer = new StringBuffer();
         final Double[] charge = {0d};
         briefMap.forEach((productName, amountChargeArray) -> {
-            buffer.append(productName).append(" 下单：").append(amountChargeArray[0]).append("斤，应收款：").append(amountChargeArray[1]).append("\n");
+            buffer.append(productName).append(" 下单：").append(amountChargeArray[0]).append("斤，应收款：").append(formatter.format(amountChargeArray[1])).append("\n");
             charge[0] += amountChargeArray[1];
         });
         buffer.append("共计：").append(charge[0]).append("元");
@@ -199,6 +201,7 @@ public class SheetReader {
         return buffer.toString();
     }
 
+    private static final NumberFormat formatter = new DecimalFormat("0.00");
 
     public static void main(String[] args) {
 //        String path = "/Users/jhyang/IdeaProjects/doufu/doufu-management/src/main/resources/order-202111.xlsx";

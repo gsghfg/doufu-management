@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Built-By: 86133
+Class-Path: libs/poi-3.17.jar libs/commons-codec-1.10.jar libs/commons
+ -collections4-4.1.jar libs/poi-ooxml-3.15.jar libs/poi-ooxml-schemas-
+ 3.15.jar libs/xmlbeans-2.6.0.jar libs/stax-api-1.0.1.jar libs/curvesa
+ pi-1.04.jar libs/fastjson-1.2.28.jar libs/slf4j-simple-1.7.25.jar lib
+ s/slf4j-api-1.7.25.jar libs/commons-lang3-3.9.jar libs/pdfbox-2.0.21.
+ jar libs/fontbox-2.0.21.jar libs/commons-logging-1.2.jar libs/itextpd
+ f-5.2.1.jar libs/itext-asian-5.2.0.jar libs/itext-2.0.6.jar
+Created-By: Apache Maven 3.6.3
+Build-Jdk: 1.8.0_181
+Main-Class: com.zf.product.doufu.Main
+
